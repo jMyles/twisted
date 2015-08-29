@@ -4,6 +4,7 @@
 """
 Tests for L{twisted.web.wsgi}.
 """
+import traceback
 
 __metaclass__ = type
 
@@ -1187,7 +1188,15 @@ class StartResponseTests(WSGITestsMixin, TestCase):
                     'HTTP/1.1 200 OK\r\n'))
             self.assertEqual(reraised[0][0], excInfo[0])
             self.assertEqual(reraised[0][1], excInfo[1])
-            self.assertEqual(reraised[0][2].tb_next, excInfo[2])
+
+            # Show that the tracebacks end with the same stack frames.
+            tb1 = reraised[0][2].tb_next
+            tb2 = excInfo[2]
+            self.assertEqual(
+                traceback.extract_tb(tb1)[1],
+                traceback.extract_tb(tb2)[0]
+            )
+
 
         d.addCallback(cbRendered)
 
