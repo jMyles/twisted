@@ -210,7 +210,8 @@ class EnvironTests(WSGITestsMixin, TestCase):
     object by L{twisted.web.wsgi.WSGIResource}.
     """
     def environKeyEqual(self, key, value):
-        def assertEnvironKeyEqual((environ, startResponse)):
+        def assertEnvironKeyEqual(wsgi_params):
+            environ, startResponse = wsgi_params
             self.assertEqual(environ[key], value)
         return assertEnvironKeyEqual
 
@@ -221,7 +222,8 @@ class EnvironTests(WSGITestsMixin, TestCase):
         parameter which is exactly of type C{dict}.
         """
         d = self.render('GET', '1.1', [], [''])
-        def cbRendered((environ, startResponse)):
+        def cbRendered(wsgi_params):
+            environ, startResponse = wsgi_params
             self.assertIdentical(type(environ), dict)
         d.addCallback(cbRendered)
         return d
@@ -445,7 +447,8 @@ class EnvironTests(WSGITestsMixin, TestCase):
         """
         singleValue = self.render(
             'GET', '1.1', [], [''], None, [('foo', 'bar'), ('baz', 'quux')])
-        def cbRendered((environ, startResponse)):
+        def cbRendered(wsgi_params):
+            environ, startResponse = wsgi_params
             self.assertEqual(environ['HTTP_FOO'], 'bar')
             self.assertEqual(environ['HTTP_BAZ'], 'quux')
         singleValue.addCallback(cbRendered)
@@ -542,7 +545,8 @@ class EnvironTests(WSGITestsMixin, TestCase):
         self.addCleanup(removeObserver, events.append)
 
         errors = self.render('GET', '1.1', [], [''])
-        def cbErrors((environ, startApplication)):
+        def cbErrors(wsgi_params):
+            environ, startResponse = wsgi_params
             errors = environ['wsgi.errors']
             errors.write('some message\n')
             errors.writelines(['another\nmessage\n'])

@@ -256,7 +256,6 @@ class _WSGIResponse:
         """
         if self.started and excInfo is not None:
             reraise(excInfo[1], excInfo[2])
-            # raise excInfo[0]
         self.status = status
         self.headers = headers
         return self.write
